@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio — Desarrollador de Software</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a26;
+      --border: rgba(255,255,255,0.07);
+      --accent: #00e5a0;
+      --accent2: #5b6af7;
+      --accent3: #ff6b6b;
+      --text: #e8e8f0;
+      --muted: #6b6b8a;
+      --card-hover: rgba(0,229,160,0.04);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── GRID LINES ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(91,106,247,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(91,106,247,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── GLOW ORBS ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 { width: 600px; height: 600px; background: rgba(0,229,160,0.06); top: -200px; right: -200px; }
+    .orb-2 { width: 500px; height: 500px; background: rgba(91,106,247,0.07); bottom: 20%; left: -150px; }
+
+    /* ── LAYOUT ── */
+    .wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      background: rgba(10,10,15,0.8);
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem;
+      color: var(--accent); letter-spacing: -0.5px; text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--muted);
+      text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero { padding: 160px 0 100px; }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--accent);
+      border: 1px solid rgba(0,229,160,0.25); border-radius: 100px;
+      padding: 0.3rem 1rem; margin-bottom: 2rem;
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero-tag::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    h1 {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      line-height: 1.05; letter-spacing: -2px; margin-bottom: 1.5rem;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    h1 .dim { color: var(--muted); }
+    h1 .accent { color: var(--accent); }
+
+    .hero-sub {
+      font-size: 1.15rem; color: var(--muted); max-width: 520px;
+      line-height: 1.7; margin-bottom: 2.5rem;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.6s 0.3s ease both; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.75rem; border-radius: 8px;
+      font-family: 'DM Mono', monospace; font-size: 0.85rem;
+      text-decoration: none; font-weight: 500; transition: all 0.2s; cursor: pointer;
+    }
+    .btn-primary { background: var(--accent); color: #0a0a0f; }
+    .btn-primary:hover { background: #00ffb2; transform: translateY(-1px); }
+    .btn-ghost { border: 1px solid var(--border); color: var(--text); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-stats {
+      display: flex; gap: 3rem; margin-top: 4rem; padding-top: 3rem;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+    .stat-num {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; color: var(--accent);
+    }
+    .stat-label { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); }
+
+    @keyframes fadeUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── SECTION HEADER ── */
+    .section { padding: 80px 0; }
+    .section-label {
+      font-family: 'DM Mono', monospace; font-size: 0.75rem;
+      color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -1px; margin-bottom: 3rem;
+    }
+    .section-title span { color: var(--muted); }
+
+    /* ── PROJECT CARDS ── */
+    .projects-grid { display: grid; gap: 1.5rem; }
+
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      transition: all 0.3s ease;
+      position: relative; overflow: hidden;
+    }
+    .project-card::before {
+      content: ''; position: absolute;
+      inset: 0; opacity: 0;
+      background: radial-gradient(600px circle at var(--mx,50%) var(--my,50%), rgba(0,229,160,0.04), transparent 40%);
+      transition: opacity 0.3s;
+    }
+    .project-card:hover { border-color: rgba(0,229,160,0.2); transform: translateY(-2px); }
+    .project-card:hover::before { opacity: 1; }
+
+    .project-card.featured { border-color: rgba(0,229,160,0.15); }
+
+    .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .card-icon {
+      width: 52px; height: 52px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+    }
+    .card-icon.green { background: rgba(0,229,160,0.1); }
+    .card-icon.blue { background: rgba(91,106,247,0.12); }
+
+    .card-links { display: flex; gap: 0.5rem; }
+    .card-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: 'DM Mono', monospace; font-size: 0.75rem;
+      color: var(--muted); text-decoration: none;
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 0.35rem 0.75rem; transition: all 0.2s;
+    }
+    .card-link:hover { color: var(--accent); border-color: rgba(0,229,160,0.3); }
+
+    .card-title {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 1.5rem; letter-spacing: -0.5px; margin-bottom: 0.25rem;
+    }
+    .card-subtitle { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--accent); margin-bottom: 1rem; }
+    .card-desc { color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; font-size: 0.95rem; }
+
+    .card-features { list-style: none; margin-bottom: 1.75rem; display: grid; gap: 0.5rem; }
+    .card-features li {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      font-size: 0.875rem; color: var(--muted); line-height: 1.5;
+    }
+    .card-features li::before { content: '→'; color: var(--accent); flex-shrink: 0; font-family: monospace; }
+
+    .tech-stack { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tech-pill {
+      font-family: 'DM Mono', monospace; font-size: 0.72rem;
+      padding: 0.25rem 0.75rem; border-radius: 100px;
+      border: 1px solid var(--border); color: var(--muted);
+      background: var(--surface2);
+    }
+    .tech-pill.highlight { border-color: rgba(0,229,160,0.3); color: var(--accent); background: rgba(0,229,160,0.05); }
+
+    .card-divider { height: 1px; background: var(--border); margin: 1.75rem 0; }
+
+    /* ── ABOUT ── */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    .about-text p { color: var(--muted); line-height: 1.8; margin-bottom: 1rem; }
+    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .skill-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.25rem;
+    }
+    .skill-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.25rem; }
+    .skill-tags { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+
+    /* ── CONTACT ── */
+    .contact-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 3rem; text-align: center;
+    }
+    .contact-box h2 {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.5rem;
+      letter-spacing: -1px; margin-bottom: 1rem;
+    }
+    .contact-box p { color: var(--muted); margin-bottom: 2rem; max-width: 420px; margin-left: auto; margin-right: auto; }
+    .social-links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .social-link {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: 'DM Mono', monospace; font-size: 0.85rem;
+      text-decoration: none; padding: 0.75rem 1.5rem;
+      border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+      transition: all 0.2s;
+    }
+    .social-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 2rem 0;
+      text-align: center; font-family: 'DM Mono', monospace;
+      font-size: 0.75rem; color: var(--muted);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .hero-stats { gap: 2rem; flex-wrap: wrap; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .card-header { flex-direction: column; }
+      nav { display: none; }
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">&lt;dev /&gt;</a>
+    <ul class="nav-links">
+      <li><a href="#proyectos">proyectos</a></li>
+      <li><a href="#sobre-mi">sobre mí</a></li>
+      <li><a href="#contacto">contacto</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrapper">
+    <div class="hero-tag">Disponible para nuevas oportunidades</div>
+    <h1>
+      Hola, soy<br>
+      <!-- ✏️ CAMBIA "Tu Nombre" por tu nombre real -->
+      <span class="accent">Tu Nombre</span><br>
+      <span class="dim">Dev &amp; Builder</span>
+    </h1>
+    <p class="hero-sub">
+      Desarrollo aplicaciones Android e integraciones backend con Python.
+      Me apasiona construir productos útiles con código limpio y arquitecturas escalables.
+    </p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="#proyectos">Ver proyectos →</a>
+      <!-- ✏️ CAMBIA el href por tu perfil de LinkedIn real -->
+      <a class="btn btn-ghost" href="https://linkedin.com/in/tu-perfil" target="_blank">LinkedIn ↗</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">2</div>
+        <div class="stat-label">proyectos publicados</div>
+      </div>
+      <div>
+        <div class="stat-num">3+</div>
+        <div class="stat-label">tecnologías dominadas</div>
+      </div>
+      <div>
+        <div class="stat-num">2026</div>
+        <div class="stat-label">graduación</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="section" id="proyectos">
+  <div class="wrapper">
+    <div class="section-label">// proyectos</div>
+    <h2 class="section-title">Lo que he <span>construido</span></h2>
+
+    <div class="projects-grid">
+
+      <!-- PROJECT 1: EcoRide -->
+      <div class="project-card featured" id="ecoride">
+        <div class="card-header">
+          <div class="card-icon green">🛴</div>
+          <div class="card-links">
+            <!-- ✏️ CAMBIA este href por tu repo de GitHub cuando lo subas -->
+            <a class="card-link" href="https://github.com/TU_USUARIO/TFG-EcoRide" target="_blank">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <div class="card-title">EcoRide — App Android TFG</div>
+        <div class="card-subtitle">Proyecto Final de Grado · Android · 2026</div>
+        <div class="card-desc">
+          Aplicación Android completa para el alquiler de patinetes eléctricos. Arquitectura
+          MVVM con Jetpack Compose, caché offline con Room y autenticación JWT persistida.
+          Incluye backend REST en Flask con endpoints para usuarios, vehículos y alquileres.
+        </div>
+
+        <ul class="card-features">
+          <li>Autenticación JWT persistida con DataStore entre sesiones</li>
+          <li>Caché local con Room — funciona sin conexión a internet</li>
+          <li>Navegación completa: Login → Lista de patinetes → Detalle → Historial</li>
+          <li>StateFlow + ViewModel que sobrevive rotaciones de pantalla</li>
+          <li>Backend Flask con API REST documentada y credenciales de prueba</li>
+        </ul>
+
+        <div class="card-divider"></div>
+
+        <div class="tech-stack">
+          <span class="tech-pill highlight">Kotlin</span>
+          <span class="tech-pill highlight">Jetpack Compose</span>
+          <span class="tech-pill highlight">MVVM</span>
+          <span class="tech-pill">Retrofit</span>
+          <span class="tech-pill">Room DB</span>
+          <span class="tech-pill">DataStore</span>
+          <span class="tech-pill">Coroutines</span>
+          <span class="tech-pill">Material 3</span>
+          <span class="tech-pill">Flask</span>
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">Android Studio</span>
+        </div>
+      </div>
+
+      <!-- PROJECT 2: AirTrack RFID -->
+      <div class="project-card" id="airtrack">
+        <div class="card-header">
+          <div class="card-icon blue">🧳</div>
+          <div class="card-links">
+            <!-- ✏️ CAMBIA este href por tu repo de GitHub cuando lo subas -->
+            <a class="card-link" href="https://github.com/TU_USUARIO/AirTrack-RFID" target="_blank">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <div class="card-title">AirTrack RFID — Control de Equipaje</div>
+        <div class="card-subtitle">Sistema de Trazabilidad · Full Stack · 2026</div>
+        <div class="card-desc">
+          Sistema completo de trazabilidad de maletas y cajas en aeropuerto mediante RFID.
+          Arquitectura containerizada con Docker Compose: FastAPI + PostgreSQL + Keycloak para
+          autenticación OAuth2/OpenID + Nginx como reverse proxy. Integración con pistola
+          lectora Android HT518-R501.
+        </div>
+
+        <ul class="card-features">
+          <li>API REST completa con 15+ endpoints para scans, vuelos y ubicaciones</li>
+          <li>Autenticación robusta con Keycloak (roles: admin, operator, viewer)</li>
+          <li>Soporte batch offline — sincroniza lecturas RFID acumuladas</li>
+          <li>Dashboard con estadísticas en tiempo real y gestión de incidencias</li>
+          <li>Despliegue con un solo comando: <code style="color:var(--accent);font-family:monospace">docker compose up --build</code></li>
+        </ul>
+
+        <div class="card-divider"></div>
+
+        <div class="tech-stack">
+          <span class="tech-pill highlight">FastAPI</span>
+          <span class="tech-pill highlight">Python</span>
+          <span class="tech-pill highlight">Docker</span>
+          <span class="tech-pill">PostgreSQL</span>
+          <span class="tech-pill">Keycloak</span>
+          <span class="tech-pill">OAuth2</span>
+          <span class="tech-pill">Nginx</span>
+          <span class="tech-pill">Bulma CSS</span>
+          <span class="tech-pill">RFID</span>
+          <span class="tech-pill">Android</span>
+          <span class="tech-pill">REST API</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="sobre-mi">
+  <div class="wrapper">
+    <div class="section-label">// sobre mí</div>
+    <h2 class="section-title">Quién <span>soy</span></h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <!-- ✏️ PERSONALIZA este texto con tu historia real -->
+        <p>
+          Desarrollador apasionado por construir aplicaciones que resuelven problemas reales.
+          Me gradué en 2026 con un TFG centrado en desarrollo móvil Android moderno con
+          arquitecturas limpias y escalables.
+        </p>
+        <p>
+          Disfruto tanto del frontend móvil como del backend: desde diseñar una UI fluida
+          en Jetpack Compose hasta montar una API robusta con FastAPI y PostgreSQL,
+          pasando por containerizar todo con Docker.
+        </p>
+        <p>
+          Actualmente buscando mi primera oportunidad profesional para seguir creciendo
+          en un equipo donde pueda aportar y aprender.
+        </p>
+      </div>
+      <div>
+        <div class="skills-grid">
+          <div class="skill-item">
+            <div class="skill-name">📱 Android</div>
+            <div class="skill-tags">Kotlin · Compose · MVVM · Room</div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">⚙️ Backend</div>
+            <div class="skill-tags">FastAPI · Flask · Python · REST</div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">🗄️ Datos</div>
+            <div class="skill-tags">PostgreSQL · SQLite · Room DB</div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">🐳 DevOps</div>
+            <div class="skill-tags">Docker · Docker Compose · Nginx</div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">🔐 Auth</div>
+            <div class="skill-tags">Keycloak · OAuth2 · JWT · OpenID</div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">🔧 Herramientas</div>
+            <div class="skill-tags">Git · GitHub · Android Studio</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section" id="contacto">
+  <div class="wrapper">
+    <div class="contact-box">
+      <h2>¿Hablamos?</h2>
+      <p>Estoy abierto a oportunidades laborales, colaboraciones o simplemente un café virtual.</p>
+      <div class="social-links">
+        <!-- ✏️ CAMBIA los hrefs por tus links reales -->
+        <a class="social-link" href="https://linkedin.com/in/tu-perfil" target="_blank">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.44-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.35-1.85 3.58 0 4.24 2.36 4.24 5.43v6.31zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+          LinkedIn
+        </a>
+        <a class="social-link" href="https://github.com/TU_USUARIO" target="_blank">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <!-- ✏️ CAMBIA por tu email real -->
+        <a class="social-link" href="mailto:tu@email.com">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          Email
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrapper">
+    <p>Construido con HTML &amp; CSS · Alojado en GitHub Pages · <!-- ✏️ Tu nombre --> Tu Nombre · 2026</p>
+  </div>
+</footer>
+
+<script>
+  // Mouse-follow glow on cards
+  document.querySelectorAll('.project-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100) + '%');
+      card.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%');
+    });
+  });
+</script>
+
+</body>
+</html>
